@@ -50,5 +50,38 @@ module.exports = function (app) {
         }
       });
     })
+    .get((req, res) => {
+      const board = req.params.board;
+      BoardModel.findOne({ name: board }, (err, data) => {
+        if (!data) {
+          console.log("No board with this name found");
+          res.json({ error: "No board with this name" });
+        } else {
+          console.log("data", data);
+          const threads = data.threads.map((thread) => {
+            const {
+              _id,
+              text,
+              created_on,
+              bumped_on,
+              reported,
+              delete_password,
+              replies,
+            } = thread;
+            return {
+              _id,
+              text,
+              created_on,
+              bumped_on,
+              reported,
+              delete_password,
+              replies,
+              replycount: thread.replies.length,
+            }
+          })
+          res.json(threads)
+        }
+      })
+    })
   app.route('/api/replies/:board');
 }
