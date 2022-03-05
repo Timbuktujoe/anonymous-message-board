@@ -83,5 +83,23 @@ module.exports = function (app) {
         }
       })
     })
+    .put((req, res) => {
+      console.log("put", req.body)
+      const { report_id } = req.body
+      const board = req.params.board
+      BoardModel.findOne({ name: board }, (err, boardData) => {
+        if (!boardData) {
+          res.json("error", "Board not found")
+        } else {
+          const date = new Date();
+          let reportedThread = boardData.threads.id(report_id)
+          reportedThread.reported = true
+          reportedThread.bumped_on = date
+          boardData.save((err, updatedData) => {
+            res.send("Success")
+          })
+        }
+      })
+    })
   app.route('/api/replies/:board');
 }
